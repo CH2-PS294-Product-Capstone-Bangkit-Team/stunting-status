@@ -5,8 +5,8 @@ import numpy as np
 app = Flask(__name__)
 
 # Ganti dengan nama file CSV dan path yang sesuai
-growth_path = 'ChildGrowthAssessmentParameters.csv'
-wasted_path = 'WastedAssessmentParameters.csv'
+growth_path = 'data/ChildGrowthAssessmentParameters.csv'
+wasted_path = 'sata/WastedAssessmentParameters.csv'
 
 # Baca data dari CSV
 data = pd.read_csv(growth_path)
