@@ -1,38 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='styles.css') }}"
-    />
-    <title>Child Growth Assessment</title>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Child Growth Assessment</h1>
-      <form action="/assessment" method="post">
-        <label for="day">Day of Birth:</label>
-        <input type="number" name="day" required />
-        <br />
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Form</title>
+</head>
+<body>
+    <h1>Child Growth Assessment</h1>
+
+    <form id="assessmentForm">
+        <label for="day">Day:</label>
+        <input type="number" name="day" required><br>
+
         <label for="gender">Gender:</label>
         <select name="gender" required>
-          <option value="Boy">Boy</option>
-          <option value="Girl">Girl</option>
-        </select>
-        <br />
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select><br>
+
         <label for="height">Height (cm):</label>
-        <!-- Mengubah type menjadi "number" dan menambahkan step untuk mendukung desimal -->
-        <input type="number" name="height" step="0.01" required />
-        <br />
+        <input type="number" name="height" step="0.01" required><br>
+
         <label for="weight">Weight (kg):</label>
-        <!-- Mengubah type menjadi "number" dan menambahkan step untuk mendukung desimal -->
-        <input type="number" name="weight" step="0.01" required />
-        <br />
-        <button type="submit">Assess</button>
-      </form>
+        <input type="number" name="weight" step="0.01" required><br>
+
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <div id="result">
+        <!-- Display assessment results here -->
     </div>
-  </body>
+
+    <script>
+        function submitForm() {
+            const form = document.getElementById('assessmentForm');
+            const formData = new FormData(form);
+
+            fetch('/assessment', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => displayResults(data))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function displayResults(data) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h2>Assessment Results</h2>
+                <p>Stunting: ${data.stunting.message}</p>
+                <p>Underweight: ${data.underweight.message}</p>
+                <p>Wasted: ${data.wasted.message}</p>
+            `;
+        }
+    </script>
+</body>
 </html>

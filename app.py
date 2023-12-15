@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 from dotenv import load_dotenv
 import pandas as pd
-import numpy as np
 import os
 from flask_cors import CORS
 
@@ -11,7 +10,6 @@ app = Flask(__name__)
 CORS(app)
 
 app.config['DEBUG'] = os.environ.get('FLASK_DEBUG')
-
 
 # Ganti dengan nama file CSV dan path yang sesuai
 growth_path = 'data/ChildGrowthAssessmentParameters.csv'
@@ -33,38 +31,37 @@ def determine_status_stunting(day, gender, height):
 
         # Tentukan logika untuk menentukan status stunting 
         if height < sev_stunted:
-            return jsonify(
-                    message="Severely Stunted",
-                    category="success",
-                    status=200
-                )
+            return {
+                'message': "Severely Stunted",
+                'category': "success",
+                'status': 200
+            }
         elif min_mod_stunted < height <= max_mod_stunted:
-            return jsonify(
-                    message="Moderately Stunted",
-                    category="success",
-                    status=200
-                )
+            return {
+                'message': "Moderately Stunted",
+                'category': "success",
+                'status': 200
+            }
         elif height > normal_height:
-            return jsonify(
-                    message="Normal Height",
-                    category="success",
-                    status=200
-                )
+            return {
+                'message': "Normal Height",
+                'category': "success",
+                'status': 200
+            }
         else:
-            return jsonify(
-                    message="Has no categories",
-                    category="success",
-                    status=204
-                )
+            return {
+                'message': "Has no categories",
+                'category': "success",
+                'status': 204
+            }
     else:
-        return jsonify(
-                    message="Data not found",
-                    category="error",
-                    status=404
-                )
+        return {
+            'message': "Data not found",
+            'category': "error",
+            'status': 404
+        }
 
 # status underweight
-   
 def determine_status_underweight(day, gender, weight):
     selected_data = data[(data['Day'] == day) & (data['Gender'] == gender)]
 
@@ -76,36 +73,36 @@ def determine_status_underweight(day, gender, weight):
 
         # Tentukan logika untuk menentukan status underweight 
         if weight < sev_under:
-            return jsonify(
-                    message="Severely Underweight",
-                    category="success",
-                    status=200
-                )
+            return {
+                'message': "Severely Underweight",
+                'category': "success",
+                'status': 200
+            }
         elif min_mod_under < weight <= max_mod_under:
-            return jsonify(
-                    message="Moderately Underweight",
-                    category="success",
-                    status=200
-                )
+            return {
+                'message': "Moderately Underweight",
+                'category': "success",
+                'status': 200
+            }
         elif weight > normal_weight:
-            return jsonify(
-                    message="Normal Weight",
-                    category="success",
-                    status=200
-                )
+            return {
+                'message': "Normal Weight",
+                'category': "success",
+                'status': 200
+            }
         else:
-            return jsonify(
-                    message="Has no categories",
-                    category="success",
-                    status=204
-                )
+            return {
+                'message': "Has no categories",
+                'category': "success",
+                'status': 204
+            }
     else:
-        return jsonify(
-                    message="Data not found",
-                    category="error",
-                    status=404
-                )
-    
+        return {
+            'message': "Data not found",
+            'category': "error",
+            'status': 404
+        }
+
 def determine_status_wasted(gender, height, weight):
     selected_data = wasted_data[(wasted_data['Gender'] == gender) & (wasted_data['Height'] == height)]
 
@@ -121,49 +118,47 @@ def determine_status_wasted(gender, height, weight):
 
         # Tentukan status wasted berdasarkan berat badan
         if weight <= sam_min:
-            return jsonify(
-                    message="SAM (Severe Acute Malnutrition)",
-                    category="success",
-                    status=200
-                )
+            return {
+                'message': "SAM (Severe Acute Malnutrition)",
+                'category': "success",
+                'status': 200
+            }
         elif mam_min < weight <= mam_max:
-            return jsonify(
-                    message="MAM (Moderate Acute Malnutrition)",
-                    category="success",
-                    status=200
-                )
+            return {
+                'message': "MAM (Moderate Acute Malnutrition)",
+                'category': "success",
+                'status': 200
+            }
         elif normal_min < weight <= normal_max:
-            return jsonify(
-                    message="Normal Nutrition",
-                    category="success",
-                    status=200
-                )
+            return {
+                'message': "Normal Nutrition",
+                'category': "success",
+                'status': 200
+            }
         elif over_min < weight <= over_max:
-            return jsonify(
-                    message="Overweight",
-                    category="success",
-                    status=200
-                )
+            return {
+                'message': "Overweight",
+                'category': "success",
+                'status': 200
+            }
         elif weight > obsese:
-            return jsonify(
-                    message="Obese",
-                    category="success",
-                    status=200
-                )
+            return {
+                'message': "Obese",
+                'category': "success",
+                'status': 200
+            }
         else:
-            return jsonify(
-                    message="Has no categories",
-                    category="success",
-                    status=204
-                )
+            return {
+                'message': "Has no categories",
+                'category': "success",
+                'status': 204
+            }
     else:
-        return jsonify(
-                    message="Data not found",
-                    category="error",
-                    status=404
-                )
-
-from flask import request, jsonify
+        return {
+            'message': "Data not found",
+            'category': "error",
+            'status': 404
+        }
 
 @app.route('/')
 def index():
@@ -172,6 +167,7 @@ def index():
 @app.route('/assessment', methods=['POST'])
 def assessment():
     try:
+        # Use request.form to get form data from the request body
         day = int(request.form['day'])
         gender = request.form['gender']
         height = float(request.form['height'])
@@ -188,19 +184,19 @@ def assessment():
 
         response_data = {
             'stunting': {
-                'message': stunting_status.json['message'],
-                'category': stunting_status.json['category'],
-                'status': stunting_status.json['status']
+                'message': stunting_status['message'],
+                'category': stunting_status['category'],
+                'status': stunting_status['status']
             },
             'underweight': {
-                'message': underweight_status.json['message'],
-                'category': underweight_status.json['category'],
-                'status': underweight_status.json['status']
+                'message': underweight_status['message'],
+                'category': underweight_status['category'],
+                'status': underweight_status['status']
             },
             'wasted': {
-                'message': wasted_status.json['message'],
-                'category': wasted_status.json['category'],
-                'status': wasted_status.json['status']
+                'message': wasted_status['message'],
+                'category': wasted_status['category'],
+                'status': wasted_status['status']
             }
         }
 
